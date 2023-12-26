@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>smarty_arm_interface</name>
+  <version>0.0.0</version>
+  <description>The smarty_arm_interface package for ROS2</description>
+
+  <maintainer email="abbas.a@northeastern.edu">xnuc0</maintainer>
+  <license>TODO</license>
+
+  <!-- Example of a URL tag -->
+  <!-- <url type="website">http://wiki.ros.org/smarty_arm_interface</url> -->
+
+  <!-- Example of an author tag -->
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+  <!-- ROS2 dependencies -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+
+  <!-- The export tag remains largely the same between ROS1 and ROS2 -->
+  <export>
+    <!-- Additional information can be placed here -->
+  </export>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+</package>
