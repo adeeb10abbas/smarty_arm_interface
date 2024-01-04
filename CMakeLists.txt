@@ -15,6 +15,7 @@ find_package(Boost REQUIRED COMPONENTS system thread program_options)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
+find_package(smarty_arm_msg REQUIRED)
 
 # Include directories
 include_directories(
@@ -52,6 +53,7 @@ ament_target_dependencies(${PROJECT_NAME}_node
   geometry_msgs
   rclcpp_lifecycle
   rosidl_default_runtime
+  smarty_arm_msg
 )
 
 # Install targets
