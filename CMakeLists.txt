@@ -24,10 +24,10 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp  
   ${rosidl_generator_cpp_INCLUDE_DIRS}  
 )
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Ptipacket.msg"
-  DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
-)
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   "msg/Ptipacket.msg"
+#   DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
+# )
 # Declare a C++ library
 add_library(${PROJECT_NAME}_src
   src/shm.c

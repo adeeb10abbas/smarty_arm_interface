@@ -3,7 +3,7 @@
 
 using namespace std;
 using namespace rclcpp;
-
+        
 
 // SMARTY_ARM_Node::SMARTY_ARM_Node(const std::string &name, Arm *armptr, const std::string &type)
 //     : Node(name), arm(armptr), node_type(type) {
@@ -71,6 +71,15 @@ void SMARTY_ARM_Node::publish_ptipacket() {
 }
 
 
+void SMARTY_ARM_Node::origin_shift_callback(smarty_arm_msg::msg::Config &config){
+
+    pthread_mutex_lock(&arm->mutex);
+    origin_position[0] = config.origin_shift_x;
+    origin_position[1] = config.origin_shift_y;
+    origin_position[2] = config.origin_shift_z;
+    pthread_mutex_unlock(&arm->mutex);
+    RCLCPP_INFO(this->get_logger(), "Origin shift updated");
+}
 
 void SMARTY_ARM_Node::publish_pose_state() {
     geometry_msgs::msg::Pose pose;
@@ -115,26 +124,66 @@ void SMARTY_ARM_Node::ptipacket_callback(const smarty_arm_msg::msg::Ptipacket::S
 }
 
 void SMARTY_ARM_Node::run() {
-    // Main loop logic, adapt for ROS2
-    rclcpp::Rate loop_rate(1000); // Example rate, adjust as needed
+    int teleop_freq = 1000;
+    int low_freq_state_pub = 10;
+    int low_freq_state_pub_index = 0;
+    rclcpp::Rate loop_rate(teleop_freq);
+    arm->ts.remote_time = this->get_clock()->now().seconds();
+
     while (rclcpp::ok()) {
-        // Your loop contents
+        /* Publisher (wrap) */
+        publish_ptipacket();
+        if (low_freq_state_pub_index >= int(teleop_freq/low_freq_state_pub)) {
+            low_freq_state_pub_index = 0;
+        }
+        if (low_freq_state_pub_index == 0) {
+            publish_pose_state();
+        }
+        low_freq_state_pub_index++;
+
+        for(int i = 0; i < DOF/2; i++) {
+            arm->ptiPacket[i].position_origin_shift = origin_position[i];
+        }
+
+        /* Subscriber callback loop */
         rclcpp::spin_some(shared_from_this());
         loop_rate.sleep();
     }
 }
 
-int main(int argc, char **argv) {
-    // rclcpp::init(argc, argv);
-    // Arm initialization and ROS2 node creation
-    // auto node = std::make_shared<SMARTY_ARM_Node>("smarty_arm_msg", arm, std::string(argv[1]));
 
-    // // Parameter handling setup if needed
+int main(int argc, char** argv) {
+    // Check for correct number of arguments
+    if (argc < 2 || strlen(argv[1]) != 1) {
+        std::cerr << "Usage: " << argv[0] << " [single character, e.g., L or R]" << std::endl;
+        return 1;
+    }
 
-    // RCLCPP_INFO(node->get_logger(), "Node starts running");
-    // node->run();
+    // Initialize ROS2
+    rclcpp::init(argc, argv);
+    RCLCPP_INFO(rclcpp::get_logger("Main"), "Launch ROS2 interface");
 
-    // rclcpp::shutdown();
+    // Instantiate input-output data variables
+    char armType = argv[1][0]; // Take the first character of argv[1]
+    Arm* arm = initArm(armType);
+    if (arm == nullptr) {
+        RCLCPP_ERROR(rclcpp::get_logger("Main"), "Init arm failed. shm_open error, errno(%d): %s", errno, strerror(errno));
+        return 1;
+    }
+
+    // Initialize a node with "master" or "slave" setting
+    auto smarty_arm = std::make_shared<SMARTY_ARM_Node>("smarty_arm_interface", arm, std::string(argv[1]));
+
+    for(int i = 0; i < DOF/2; i++) {
+        smarty_arm->origin_position[i] = 0.0;
+    }
+
+    // TODO: ROS2 parameter handling (if needed, replace dynamic_reconfigure)
+    // Set up parameter callback or services as per your application requirements
+
+    RCLCPP_INFO(smarty_arm->get_logger(), "Node starts running");
+    rclcpp::spin(smarty_arm);
+
+    rclcpp::shutdown();
     return 0;
 }
-

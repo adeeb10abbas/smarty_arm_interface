@@ -14,9 +14,10 @@
 #include "geometry_msgs/msg/pose.hpp"
 // #include "smarty_arm_interface/msg/ptipacket.hpp"
 #include "smarty_arm_msg/msg/ptipacket.hpp"
-
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
-#include "smarty_arm_interface/shm.h"
+// #include "smarty_arm_interface/shm.h"
+#include "smarty_arm_msg/msg/config.hpp"
+
 /* C headers */
 extern "C" {
 #include "shm.h"
@@ -28,6 +29,7 @@ public:
     // ~SMARTY_ARM_Node() override;
 
     void run();
+    double origin_position[DOF/2];
 
 private:
     rclcpp::Subscription<smarty_arm_msg::msg::Ptipacket>::SharedPtr smarty_arm_packet_sub;
@@ -36,11 +38,21 @@ private:
 
     Arm* arm;
     std::string node_type;
-
+        
     void publish_ptipacket();
     void publish_pose_state();
     void ptipacket_callback(const smarty_arm_msg::msg::Ptipacket::SharedPtr msg);
 
+    void origin_shift_callback(smarty_arm_msg::msg::Config &config);
+
+
+    // pthread_mutex_lock(&arm->mutex);
+    // arm->origin_shift[0] = config.origin_shift_x;
+    // arm->origin_shift[1] = config.origin_shift_y;
+    // arm->origin_shift[2] = config.origin_shift_z;
+    // pthread_mutex_unlock(&arm->mutex);
+    // RCLCPP_INFO(this->get_logger(), "Origin shift updated");
+    // }
     // Replace ROS services with ROS2 services if needed
     // bool initSlave(std_srvs::srv::Empty::Request &req, std_srvs::srv::Empty::Response &res);
 };
