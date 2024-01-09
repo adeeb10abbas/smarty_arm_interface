@@ -21,14 +21,9 @@
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>smarty_arm_msg</depend>
-  
-  <build_depend>rosidl_default_generators</build_depend>
-  <exec_depend>rosidl_default_runtime</exec_depend>
-
-
-  <!-- The export tag remains largely the same between ROS1 and ROS2 -->
   <export>
-    <!-- Additional information can be placed here -->
+    <build_type>ament_cmake</build_type>
   </export>
+
   <member_of_group>rosidl_interface_packages</member_of_group>
 </package>
