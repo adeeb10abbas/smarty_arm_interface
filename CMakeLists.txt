@@ -77,4 +77,7 @@ ament_target_dependencies(${PROJECT_NAME}_node
   "rclcpp_lifecycle"
   )
 
+install(DIRECTORY launch/
+	DESTINATION share/${PROJECT_NAME}	
+)
 ament_package()
