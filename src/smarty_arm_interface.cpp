@@ -182,7 +182,8 @@ int main(int argc, char** argv) {
     // Set up parameter callback or services as per your application requirements
 
     RCLCPP_INFO(smarty_arm->get_logger(), "Node starts running");
-    rclcpp::spin(smarty_arm);
+    // rclcpp::spin(smarty_arm);
+    smarty_arm->run();
 
     rclcpp::shutdown();
     return 0;
