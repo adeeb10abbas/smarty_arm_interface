@@ -45,14 +45,6 @@ private:
 
     void origin_shift_callback(smarty_arm_msg::msg::Config &config);
 
-
-    // pthread_mutex_lock(&arm->mutex);
-    // arm->origin_shift[0] = config.origin_shift_x;
-    // arm->origin_shift[1] = config.origin_shift_y;
-    // arm->origin_shift[2] = config.origin_shift_z;
-    // pthread_mutex_unlock(&arm->mutex);
-    // RCLCPP_INFO(this->get_logger(), "Origin shift updated");
-    // }
     // Replace ROS services with ROS2 services if needed
     // bool initSlave(std_srvs::srv::Empty::Request &req, std_srvs::srv::Empty::Response &res);
 };

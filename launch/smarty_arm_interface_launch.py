@@ -1,7 +1,9 @@
-from launch import LaunchDescription
+import launch
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
-from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, GroupAction, OpaqueFunction
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
+from launch_ros.substitutions import FindPackageShare
 
 def generate_node(context):
     smarty_arm_type = context.launch_configurations['smarty_arm_type']
@@ -16,7 +18,13 @@ def generate_node(context):
     )]
 
 def generate_launch_description():
-    return LaunchDescription([
+    config_file_path = PathJoinSubstitution([
+        FindPackageShare('smarty_arm_interface'),
+        'cfg/origin_shift.yaml'
+    ])
+    
+    return launch.LaunchDescription([
+        DeclareLaunchArgument('config_file', default_value=config_file_path),
         DeclareLaunchArgument(
             'output',
             default_value='screen',

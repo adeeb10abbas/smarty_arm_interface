@@ -12,6 +12,19 @@ using namespace rclcpp;
 // }
 SMARTY_ARM_Node::SMARTY_ARM_Node(const std::string& name, Arm* arm, const std::string& type)
 : Node(name), arm(arm), node_type(type) {
+        this->declare_parameter<std::string>("config_file", "");
+
+        std::string config_file_path = this->get_parameter("config_file").as_string();
+        if (!config_file_path.empty()) {
+            pthread_mutex_lock(&arm->mutex);
+            printf("File open: %s\n", config_file_path.c_str());
+            origin_position[0] = this->get_parameter("x0_shift").as_double();
+            origin_position[1] = this->get_parameter("y0_shift").as_double();
+            origin_position[2] = this->get_parameter("z0_shift").as_double();
+            pthread_mutex_unlock(&arm->mutex);
+            RCLCPP_INFO(this->get_logger(), "Origin shift updated");
+        }
+
         // Initialize publishers and subscribers
         if (node_type == "r") {
             smarty_arm_packet_sub = this->create_subscription<smarty_arm_msg::msg::Ptipacket>(
@@ -180,9 +193,9 @@ int main(int argc, char** argv) {
 
     // TODO: ROS2 parameter handling (if needed, replace dynamic_reconfigure)
     // Set up parameter callback or services as per your application requirements
-
+    
     RCLCPP_INFO(smarty_arm->get_logger(), "Node starts running");
-    // rclcpp::spin(smarty_arm);
+
     smarty_arm->run();
 
     rclcpp::shutdown();
